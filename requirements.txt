@@ -3,3 +3,5 @@ bs4==0.0.1
 lxml==4.6.3
 requests==2.26.0
 pydantic==1.8.2
+strictyaml==1.6.1
+tqdm==4.62.3
