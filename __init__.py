@@ -1,12 +1,15 @@
 import datetime
 import os
+from pathlib import Path
 import re
 
 import bs4
 import requests
 
-BASE_URL = "https://en.wikipedia.org"
-MAIN_URL = os.path.join(BASE_URL, "wiki", "Main_Page")
+# BASE_URL = Path("https://en.wikipedia.org")
+# MAIN_URL = (BASE_URL / "wiki" / "Main_Page").as_uri()
+MAIN_URL = "https://en.wikipedia.org/wiki/Main_Page"
+parser = "html.parser"
 
 
 class DailyEvent:
@@ -57,7 +60,7 @@ class DailyEvent:
             url: image url
         """
         data = requests.get(self.link)
-        soup = bs4.BeautifulSoup(data.content, "html5lib")
+        soup = bs4.BeautifulSoup(data.content, parser)
         for x in soup.find_all("img")[1:]:
             try:
                 image = str(x.attrs["srcset"]).split(" ")[0]
@@ -73,7 +76,7 @@ def get_daily_events():
         list: event list
     """
     data = requests.get(MAIN_URL)
-    soup = bs4.BeautifulSoup(data.content, "html5lib")
+    soup = bs4.BeautifulSoup(data.content, parser)
     daily_event_objects_list = soup.find_all(id="mp-otd")[0].find("ul").find_all("li")
 
     daily_events = []
@@ -82,6 +85,7 @@ def get_daily_events():
         de = DailyEvent(each)
         daily_events.append(de)
         print(de.link)
+        print(de.text)
 
     return daily_events
 
@@ -118,7 +122,7 @@ def create_template(event_list: list):
         title.string = article.name[:300]
 
         subtitle = article_template.p
-        subtitle.string = article.text[:300] + "..."
+        subtitle.string = article.text#[:300] + "..."
 
         link = article_template.a
         link["href"] = article.link  # urls[i]
