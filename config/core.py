@@ -2,15 +2,10 @@
 import sys
 from pathlib import Path
 
-import utils
 from pydantic import BaseModel
 from strictyaml import YAML, load
 
-PACKAGE_ROOT = Path(utils.__file__).resolve()
-ROOT = PACKAGE_ROOT.parent
-CONFIG_FILE_PATH = ROOT / "config.yaml"
-if PACKAGE_ROOT not in sys.path:
-    sys.path.append(str(PACKAGE_ROOT))
+from .paths import CONFIG_FILE_PATH
 
 
 class AppConfig(BaseModel):

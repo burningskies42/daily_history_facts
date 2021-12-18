@@ -1,7 +1,11 @@
 from typing import List
-import requests
-import bs4
 
+import bs4
+import requests
+import tqdm
+
+from config.core import config
+from config.paths import STATIC_FILES_PATH
 from daily_events import DailyEvent
 
 
@@ -16,12 +20,10 @@ def get_daily_events(main_url: str, parser: str) -> List[DailyEvent]:
     daily_event_objects_list = soup.find_all(id="mp-otd")[0].find("ul").find_all("li")
 
     daily_events = []
-    for each in daily_event_objects_list:
+    for each in tqdm.tqdm(daily_event_objects_list):
 
         de = DailyEvent(each)
         daily_events.append(de)
-        print(de.link)
-        print(de.text)
 
     return daily_events
 
@@ -35,8 +37,8 @@ def create_template(event_list: list):
     Returns:
         string: html of newsletter
     """
-    template = open("template.html")
-    soup = bs4.BeautifulSoup(template.read(), "html.parser")
+    template = open(STATIC_FILES_PATH / "template.html")
+    soup = bs4.BeautifulSoup(template.read(), config.app.parser)
 
     article_template = soup.find("div", attrs={"class": "columns"})
     html_start = str(soup)[: str(soup).find(str(article_template))]
@@ -58,7 +60,7 @@ def create_template(event_list: list):
         title.string = article.name[:300]
 
         subtitle = article_template.p
-        subtitle.string = article.text#[:300] + "..."
+        subtitle.string = article.text  # [:300] + "..."
 
         link = article_template.a
         link["href"] = article.link  # urls[i]
